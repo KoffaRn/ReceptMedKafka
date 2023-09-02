@@ -6,8 +6,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.koffa.javafxgui.dto.Ingredient;
 import org.koffa.javafxgui.dto.Recipe;
 import org.koffa.javafxgui.dto.RecipeIngredient;
@@ -20,11 +18,13 @@ import java.util.ArrayList;
 
 
 public class GraphicalUI extends Application {
+    KafkaClient kafkaClient;
     @Override
     public void start(Stage stage) {
-        // Recipe pane
         ScrollPane scrollPane = new ScrollPane();
         VBox vBox = new VBox();
+
+        // Recipe pane
         Label recipeName = new Label("Namn på recept");
         TextField receipeNameTextField = new TextField();
         receipeNameTextField.setText("Skriv namn på receptet här");
@@ -65,15 +65,19 @@ public class GraphicalUI extends Application {
                 ingredients,
                 sendButton,
                 logLabel,
-                logTextArea)
-        ;
+                logTextArea);
         scrollPane.setContent(vBox);
         Scene scene = new Scene(scrollPane, 520, 800);
         stage.setScene(scene);
         stage.show();
-        Thread thread = getKafkaThread(logTextArea);
-        thread.start();
 
+        // Start kafka consumer in own thread
+        kafkaClient = new KafkaClient(logTextArea);
+        kafkaClient.addTopic("recipeTopic");
+        Thread kafkaThread = new Thread(kafkaClient);
+        kafkaThread.start();
+
+        // Add actions to buttons
         addIngredientButton.setOnAction(event -> addIngredientPane(ingredients));
 
         removeIngredient.setOnAction(event -> {
@@ -93,25 +97,7 @@ public class GraphicalUI extends Application {
         });
     }
 
-    private static Thread getKafkaThread(TextArea logTextArea) {
-        KafkaClient kafkaClient = KafkaClient.getInstance();
-        return new Thread(() -> {
-            while(true) {
-                ConsumerRecords<String, String> records = kafkaClient.pollRecords();
-                for(ConsumerRecord<String, String> record : records) {
-                    System.out.println("test");
-                    logTextArea.appendText("Message received from kafka >> " + record.value() + "\n");
-                }
-                kafkaClient.commitAsync();
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    logTextArea.appendText(e.getMessage());
-                }
-            }
-        });
-    }
-
+    // Get recipe from GUI
     private static Recipe getRecipe(TextField receipeNameTextField, TextArea recipeDescription, SplitPane steps, SplitPane ingredients) {
         Recipe recipe = new Recipe();
         recipe.setName(receipeNameTextField.getText());
@@ -135,6 +121,7 @@ public class GraphicalUI extends Application {
         return recipe;
     }
 
+    // Send recipe to API
     private void sendRecipe(Recipe recipe, TextArea logTextArea) {
         try {
             RecipeSender recipeSender = new RecipeSender();
@@ -144,6 +131,7 @@ public class GraphicalUI extends Application {
         }
     }
 
+    // Add ingredient pane
     private static void addIngredientPane(SplitPane ingredients) {
         TextFormatter<Integer> textFormatter = new TextFormatter<>(new PositiveIntegerStringConverter(), 0, new PositiveIntegerFilter());
         SplitPane ingredientsPane = new SplitPane();
@@ -156,5 +144,10 @@ public class GraphicalUI extends Application {
 
     public static void main(String[] args) {
         launch();
+    }
+
+    @Override
+    public void stop() {
+        kafkaClient.interrupt();
     }
 }

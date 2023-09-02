@@ -1,44 +1,70 @@
 package org.koffa.javafxgui.kafka;
 
+import javafx.scene.control.TextArea;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static java.lang.System.getProperty;
 
-public class KafkaClient {
-    private static final String BOOTSTRAP_SERVERS = getProperty("server", "localhost:9092");
-    private static final String TOPIC = getProperty("topic", "recipeTopic");
-    private static final String GROUP_ID = getProperty("user", "guiGroup");
-    private static KafkaClient INSTANCE = null;
+public class KafkaClient implements Runnable {
+    private volatile boolean running = true;
+    private final List<String> topics;
     private final KafkaConsumer<String, String> consumer;
+    private static final String BOOTSTRAP_SERVERS = getProperty("server", "localhost:9092");
+    private static final String GROUP_ID = getProperty("user", "guiGroup");
+    TextArea logTextArea;
 
-    private KafkaClient() {
+    /**
+     * Creates a new KafkaClient
+     * @param logTextArea the text area to log to
+     */
+    public KafkaClient(TextArea logTextArea) {
         Properties props = new Properties();
         props.put("bootstrap.servers", BOOTSTRAP_SERVERS);
         props.put("group.id", GROUP_ID);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-
-        consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(Arrays.asList(TOPIC));
-    }
-    public ConsumerRecords<String, String> pollRecords() {
-        return consumer.poll(Duration.ofMillis(100));
-    }
-    public void commitAsync() {
-        consumer.commitAsync();
-    }
-    public static KafkaClient getInstance() {
-        if (INSTANCE == null)
-            INSTANCE = new KafkaClient();
-        return INSTANCE;
+        this.topics = new ArrayList<>();
+        this.consumer = new KafkaConsumer<>(props);
+        this.logTextArea = logTextArea;
     }
 
+    /**
+     * Adds a topic to the list of topics to listen to
+     * @param topic the topic to add
+     */
+    public void addTopic(String topic) {
+        topics.add(topic);
+        consumer.subscribe(topics);
+    }
+    @Override
+    public void run() {
+        try{
+            while (running) {
+                synchronized(this) {
+                    ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+                    for (ConsumerRecord<String, String> record : records){
+                        logTextArea.appendText("Message received from kafka >> " + record.value() + "\n");
+                    }
+                }
+                try { Thread.sleep(100); } catch (Exception ignored) { }
+            }
+        } catch (Exception e){
+            logTextArea.appendText(e.getMessage());
+        }finally {
+            consumer.close();
+        }
+    }
 
+    public void interrupt() {
+        running = false;
+    }
 }

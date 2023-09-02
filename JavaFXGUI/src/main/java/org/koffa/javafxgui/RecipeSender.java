@@ -11,11 +11,23 @@ import java.nio.charset.StandardCharsets;
 
 public class RecipeSender {
     private final HttpURLConnection connection;
+
+    /**
+     * Creates a new RecipeSender
+     * @throws IOException if the connection fails
+     */
     public RecipeSender() throws IOException {
         String urlString = "http://localhost:8080/api/v1/recipe/publish";
         URL url = new URL(urlString);
         this.connection = (HttpURLConnection) url.openConnection();
     }
+
+    /**
+     * Sends a recipe to the database
+     * @param recipe the recipe to send
+     * @return the response from the database
+     * @throws ProtocolException if the protocol is not supported
+     */
     public String sendRecipe(Recipe recipe) throws ProtocolException {
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");

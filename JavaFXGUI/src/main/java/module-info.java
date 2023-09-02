@@ -9,9 +9,10 @@ module org.koffa.javafxgui {
     requires kafka.clients;
 
     opens org.koffa.javafxgui to javafx.fxml;
+    opens org.koffa.javafxgui.dto to lombok, com.google.gson;
+    opens org.koffa.javafxgui.textformatter to javafx.fxml;
+
     exports org.koffa.javafxgui;
     exports org.koffa.javafxgui.textformatter;
     exports org.koffa.javafxgui.dto;
-    opens org.koffa.javafxgui.textformatter to javafx.fxml;
-    opens org.koffa.javafxgui.dto to com.google.gson;
 }

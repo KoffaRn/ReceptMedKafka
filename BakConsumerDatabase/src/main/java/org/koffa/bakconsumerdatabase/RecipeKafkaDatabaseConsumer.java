@@ -15,10 +15,21 @@ public class RecipeKafkaDatabaseConsumer {
     private final static Logger logger = LoggerFactory.getLogger(RecipeKafkaDatabaseConsumer.class);
     private final RecipeRepository recipeRepository;
     private final IngredientRepository ingredientRepository;
+
+    /**
+     * Creates a new RecipeKafkaDatabaseConsumer
+     * @param recipeRepository the recipe repository
+     * @param ingredientRepository the ingredient repository
+     */
     public RecipeKafkaDatabaseConsumer(RecipeRepository recipeRepository, IngredientRepository ingredientRepository) {
         this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
     }
+
+    /**
+     * Consumes a message from the kafka topic
+     * @param message the message to consume
+     */
     @KafkaListener(topics = "recipeTopic", groupId = "dbGroup")
     public void consume(String message) {
         Gson gson = new Gson();
@@ -28,16 +39,21 @@ public class RecipeKafkaDatabaseConsumer {
         recipeRepository.save(recipe);
     }
 
+    //Persists recipes ingredients to the database
     private void persistRecipeIngredients(Recipe recipe) {
         for(RecipeIngredient recipeIngredient : recipe.getRecipeIngredients()) {
+            //If the ingredient is null, skip it
             if(recipeIngredient.getIngredient() == null) continue;
+            //If the ingredient already exists, skip it
             if(ingredientRepository.existsByName(recipeIngredient.getIngredient().getName())) {
                 logger.info(String.format("#### -> Ingredient already exists -> %s", recipeIngredient.getIngredient().getName()));
             }
+            //If the ingredient does not exist, save it to the database
             else {
                 logger.info(String.format("#### -> Ingredient does not exist -> %s, saving to db", recipeIngredient.getIngredient().getName()));
                 ingredientRepository.save(recipeIngredient.getIngredient());
             }
+            //Set the recipe ingredient's ingredient to the one in the database
             recipeIngredient.setIngredient(ingredientRepository.findByName(recipeIngredient.getIngredient().getName()));
         }
     }
