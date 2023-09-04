@@ -1,6 +1,7 @@
 package org.koffa.bakconsumerdatabase;
 
 import com.google.gson.Gson;
+import lombok.Getter;
 import org.koffa.bakconsumerdatabase.dto.Recipe;
 import org.koffa.bakconsumerdatabase.dto.RecipeIngredient;
 import org.koffa.bakconsumerdatabase.repository.IngredientRepository;
@@ -11,10 +12,11 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 @Service
+@Getter
 public class RecipeKafkaDatabaseConsumer {
     private final static Logger logger = LoggerFactory.getLogger(RecipeKafkaDatabaseConsumer.class);
-    private final RecipeRepository recipeRepository;
-    private final IngredientRepository ingredientRepository;
+    final RecipeRepository recipeRepository;
+    final IngredientRepository ingredientRepository;
 
     /**
      * Creates a new RecipeKafkaDatabaseConsumer
@@ -32,10 +34,19 @@ public class RecipeKafkaDatabaseConsumer {
      */
     @KafkaListener(topics = "recipeTopic", groupId = "dbGroup")
     public void consume(String message) {
+        try {
+            consumeRecipe(message);
+            logger.info(String.format("#### -> Consumed message/recipe -> %s", message));
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void consumeRecipe(String message) {
         Gson gson = new Gson();
         Recipe recipe = gson.fromJson(message, Recipe.class);
-        if(recipe.getRecipeIngredients() != null) persistRecipeIngredients(recipe);
-        logger.info(String.format("#### -> Consumed message -> %s", recipe));
+        if(recipe.getRecipeIngredients() != null)
+            persistRecipeIngredients(recipe);
         recipeRepository.save(recipe);
     }
 

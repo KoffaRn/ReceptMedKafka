@@ -23,7 +23,7 @@ public class Recipe {
     @Getter
     @Setter
     @ToString
-    static class RecipeIngredient {
+    public static class RecipeIngredient {
         private Ingredient ingredient;
         private int quantity;
         private String unit;

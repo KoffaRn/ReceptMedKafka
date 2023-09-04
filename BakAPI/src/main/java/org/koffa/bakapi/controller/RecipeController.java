@@ -2,6 +2,7 @@ package org.koffa.bakapi.controller;
 
 import org.koffa.bakapi.dto.Recipe;
 import org.koffa.bakapi.kafka.RecipeKafkaProducer;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,13 +16,13 @@ public class RecipeController {
         this.recipeKafkaProducer = recipeKafkaProducer;
     }
     @PostMapping("/publish")
-    public String publish(@RequestBody Recipe recipe) {
+    public ResponseEntity<String> publish(@RequestBody Recipe recipe) {
         try {
             recipeKafkaProducer.sendMessage(recipe);
-            return "Recipe published successfully " + recipe;
+            return ResponseEntity.ok().body("Message received and sent to kafka: " + recipe.toString());
         }
         catch(Exception e) {
-            return "Recipe publishing failed " + e.getMessage();
+            return ResponseEntity.internalServerError().body("Error sending message to kafka: " + e.getMessage());
         }
     }
 }

@@ -25,7 +25,12 @@ public class RecipeKafkaProducer {
      * @param recipe the recipe to send
      */
     public void sendMessage(Recipe recipe) {
-        LOGGER.info(String.format("Producing message: %s", recipe.toString()));
-        kafkaTemplate.send("recipeTopic", recipe);
+        try {
+            LOGGER.info(String.format("Producing message: %s", recipe.toString()));
+            kafkaTemplate.send("recipeTopic", recipe);
+        }
+        catch (Exception e) {
+            LOGGER.error("Error producing message: " + e.getMessage());
+        }
     }
 }
