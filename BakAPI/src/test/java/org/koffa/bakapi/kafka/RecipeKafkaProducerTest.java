@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.kafka.clients.admin.NewTopic;
@@ -81,7 +80,7 @@ class RecipeKafkaProducerTest {
         recipe.setRecipeIngredients(new ArrayList<>());
         recipe.setSteps(new ArrayList<>());
         recipeKafkaProducer.sendMessage(recipe);
-        verify(kafkaTemplate).send(Mockito.<String>any(), Mockito.<Recipe>any());
+        verify(kafkaTemplate).send(Mockito.any(), Mockito.any());
     }
 
     /**
