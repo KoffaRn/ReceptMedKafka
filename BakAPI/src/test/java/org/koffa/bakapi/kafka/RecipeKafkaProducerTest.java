@@ -73,7 +73,7 @@ class RecipeKafkaProducerTest {
      */
     @Test
     void testSendMessage3() {
-        when(kafkaTemplate.send(Mockito.<String>any(), Mockito.<Recipe>any())).thenReturn(new CompletableFuture<>());
+        when(kafkaTemplate.send(Mockito.any(), Mockito.any())).thenReturn(new CompletableFuture<>());
 
         Recipe recipe = new Recipe();
         recipe.setDescription("The characteristics of someone or something");
@@ -89,22 +89,22 @@ class RecipeKafkaProducerTest {
      */
     @Test
     void testSendMessage4() {
-        when(kafkaTemplate.send(Mockito.<String>any(), Mockito.<Recipe>any())).thenReturn(new CompletableFuture<>());
+        when(kafkaTemplate.send(Mockito.any(), Mockito.any())).thenReturn(new CompletableFuture<>());
         Recipe recipe = mock(Recipe.class);
-        doNothing().when(recipe).setDescription(Mockito.<String>any());
-        doNothing().when(recipe).setName(Mockito.<String>any());
-        doNothing().when(recipe).setRecipeIngredients(Mockito.<List<Recipe.RecipeIngredient>>any());
-        doNothing().when(recipe).setSteps(Mockito.<List<String>>any());
+        doNothing().when(recipe).setDescription(Mockito.any());
+        doNothing().when(recipe).setName(Mockito.any());
+        doNothing().when(recipe).setRecipeIngredients(Mockito.any());
+        doNothing().when(recipe).setSteps(Mockito.any());
         recipe.setDescription("The characteristics of someone or something");
         recipe.setName("Name");
         recipe.setRecipeIngredients(new ArrayList<>());
         recipe.setSteps(new ArrayList<>());
         recipeKafkaProducer.sendMessage(recipe);
-        verify(kafkaTemplate).send(Mockito.<String>any(), Mockito.<Recipe>any());
-        verify(recipe).setDescription(Mockito.<String>any());
-        verify(recipe).setName(Mockito.<String>any());
-        verify(recipe).setRecipeIngredients(Mockito.<List<Recipe.RecipeIngredient>>any());
-        verify(recipe).setSteps(Mockito.<List<String>>any());
+        verify(kafkaTemplate).send(Mockito.any(), Mockito.any());
+        verify(recipe).setDescription(Mockito.any());
+        verify(recipe).setName(Mockito.any());
+        verify(recipe).setRecipeIngredients(Mockito.any());
+        verify(recipe).setSteps(Mockito.any());
     }
 }
 

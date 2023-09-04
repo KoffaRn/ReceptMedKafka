@@ -11,11 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import javax.print.DocFlavor;
-import java.util.List;
-
-import static java.lang.System.getProperty;
-
 @Service
 @Getter
 public class RecipeKafkaDatabaseConsumer {
