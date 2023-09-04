@@ -11,10 +11,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import javax.print.DocFlavor;
+import java.util.List;
+
+import static java.lang.System.getProperty;
+
 @Service
 @Getter
 public class RecipeKafkaDatabaseConsumer {
-    private final static Logger logger = LoggerFactory.getLogger(RecipeKafkaDatabaseConsumer.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(RecipeKafkaDatabaseConsumer.class);
+    private final static String TOPIC = "recipeTopic";
+    private final static String GROUP_ID = "dbGroup";
+
     final RecipeRepository recipeRepository;
     final IngredientRepository ingredientRepository;
 
@@ -29,16 +37,16 @@ public class RecipeKafkaDatabaseConsumer {
     }
 
     /**
-     * Consumes a message from the kafka topic
-     * @param message the message to consume
+     * Consumes a message in the form of a jsonString representing a recipe from the kafka topic
+     * @param message the message (recipe) to consume
      */
-    @KafkaListener(topics = "recipeTopic", groupId = "dbGroup")
+    @KafkaListener(topics = TOPIC, groupId = GROUP_ID)
     public void consume(String message) {
         try {
             consumeRecipe(message);
-            logger.info(String.format("#### -> Consumed message/recipe -> %s", message));
+            LOGGER.info(String.format("#### -> Consumed message/recipe -> %s", message));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 
@@ -57,11 +65,11 @@ public class RecipeKafkaDatabaseConsumer {
             if(recipeIngredient.getIngredient() == null) continue;
             //If the ingredient already exists, skip it
             if(ingredientRepository.existsByName(recipeIngredient.getIngredient().getName())) {
-                logger.info(String.format("#### -> Ingredient already exists -> %s", recipeIngredient.getIngredient().getName()));
+                LOGGER.info(String.format("#### -> Ingredient already exists -> %s", recipeIngredient.getIngredient().getName()));
             }
             //If the ingredient does not exist, save it to the database
             else {
-                logger.info(String.format("#### -> Ingredient does not exist -> %s, saving to db", recipeIngredient.getIngredient().getName()));
+                LOGGER.info(String.format("#### -> Ingredient does not exist -> %s, saving to db", recipeIngredient.getIngredient().getName()));
                 ingredientRepository.save(recipeIngredient.getIngredient());
             }
             //Set the recipe ingredient's ingredient to the one in the database

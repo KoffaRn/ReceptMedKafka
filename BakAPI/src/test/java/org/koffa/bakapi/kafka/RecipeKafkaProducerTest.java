@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.kafka.clients.admin.NewTopic;
@@ -65,6 +66,45 @@ class RecipeKafkaProducerTest {
         verify(recipe).setName(Mockito.any());
         verify(recipe).setRecipeIngredients(Mockito.any());
         verify(recipe).setSteps(Mockito.any());
+    }
+
+    /**
+     * Method under test: {@link RecipeKafkaProducer#sendMessage(Recipe)}
+     */
+    @Test
+    void testSendMessage3() {
+        when(kafkaTemplate.send(Mockito.<String>any(), Mockito.<Recipe>any())).thenReturn(new CompletableFuture<>());
+
+        Recipe recipe = new Recipe();
+        recipe.setDescription("The characteristics of someone or something");
+        recipe.setName("Name");
+        recipe.setRecipeIngredients(new ArrayList<>());
+        recipe.setSteps(new ArrayList<>());
+        recipeKafkaProducer.sendMessage(recipe);
+        verify(kafkaTemplate).send(Mockito.<String>any(), Mockito.<Recipe>any());
+    }
+
+    /**
+     * Method under test: {@link RecipeKafkaProducer#sendMessage(Recipe)}
+     */
+    @Test
+    void testSendMessage4() {
+        when(kafkaTemplate.send(Mockito.<String>any(), Mockito.<Recipe>any())).thenReturn(new CompletableFuture<>());
+        Recipe recipe = mock(Recipe.class);
+        doNothing().when(recipe).setDescription(Mockito.<String>any());
+        doNothing().when(recipe).setName(Mockito.<String>any());
+        doNothing().when(recipe).setRecipeIngredients(Mockito.<List<Recipe.RecipeIngredient>>any());
+        doNothing().when(recipe).setSteps(Mockito.<List<String>>any());
+        recipe.setDescription("The characteristics of someone or something");
+        recipe.setName("Name");
+        recipe.setRecipeIngredients(new ArrayList<>());
+        recipe.setSteps(new ArrayList<>());
+        recipeKafkaProducer.sendMessage(recipe);
+        verify(kafkaTemplate).send(Mockito.<String>any(), Mockito.<Recipe>any());
+        verify(recipe).setDescription(Mockito.<String>any());
+        verify(recipe).setName(Mockito.<String>any());
+        verify(recipe).setRecipeIngredients(Mockito.<List<Recipe.RecipeIngredient>>any());
+        verify(recipe).setSteps(Mockito.<List<String>>any());
     }
 }
 
