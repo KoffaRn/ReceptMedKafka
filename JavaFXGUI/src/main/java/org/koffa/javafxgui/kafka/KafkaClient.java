@@ -11,11 +11,12 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.System.getProperty;
 
 public class KafkaClient implements Runnable {
-    private volatile boolean running = true;
+    private final AtomicBoolean running = new AtomicBoolean(true);
     private final List<String> topics;
     private final KafkaConsumer<String, String> consumer;
     private static final String BOOTSTRAP_SERVERS = getProperty("server", "localhost:9092");
@@ -47,14 +48,13 @@ public class KafkaClient implements Runnable {
     @Override
     public void run() {
         try{
-            while (running) {
+            while (running.get()) {
                 synchronized(this) {
                     ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
                     for (ConsumerRecord<String, String> record : records){
-                        loggerBox.info("KafkaClient: Meddelande mottaget från kafka >> " + record.value() + "\n");
+                        loggerBox.info("KafkaClient: Meddelande mottaget från kafka >> " + record.value());
                     }
                 }
-                try { Thread.sleep(100); } catch (Exception ignored) { }
             }
         } catch (Exception e){
             loggerBox.error("KafkaClient: fel i konsumering av meddelande >> ", e);
@@ -64,6 +64,6 @@ public class KafkaClient implements Runnable {
     }
 
     public void interrupt() {
-        running = false;
+        running.set(false);
     }
 }
