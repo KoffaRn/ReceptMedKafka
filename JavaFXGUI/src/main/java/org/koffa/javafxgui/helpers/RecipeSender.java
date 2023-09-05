@@ -1,4 +1,4 @@
-package org.koffa.javafxgui;
+package org.koffa.javafxgui.helpers;
 
 import com.google.gson.Gson;
 import org.koffa.javafxgui.dto.Recipe;

@@ -1,11 +1,11 @@
 package org.koffa.javafxgui.kafka;
 
-import javafx.scene.control.TextArea;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.koffa.javafxgui.recipegui.LoggerBox;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -20,13 +20,13 @@ public class KafkaClient implements Runnable {
     private final KafkaConsumer<String, String> consumer;
     private static final String BOOTSTRAP_SERVERS = getProperty("server", "localhost:9092");
     private static final String GROUP_ID = getProperty("user", "guiGroup");
-    TextArea logTextArea;
+    LoggerBox loggerBox;
 
-    /**
+    /***
      * Creates a new KafkaClient
-     * @param logTextArea the text area to log to
+     * @param loggerBox the loggerBox to log messages to
      */
-    public KafkaClient(TextArea logTextArea) {
+    public KafkaClient(LoggerBox loggerBox) {
         Properties props = new Properties();
         props.put("bootstrap.servers", BOOTSTRAP_SERVERS);
         props.put("group.id", GROUP_ID);
@@ -34,7 +34,7 @@ public class KafkaClient implements Runnable {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         this.topics = new ArrayList<>();
         this.consumer = new KafkaConsumer<>(props);
-        this.logTextArea = logTextArea;
+        this.loggerBox = new LoggerBox();
     }
 
     /**
@@ -52,13 +52,13 @@ public class KafkaClient implements Runnable {
                 synchronized(this) {
                     ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
                     for (ConsumerRecord<String, String> record : records){
-                        logTextArea.appendText("Message received from kafka >> " + record.value() + "\n");
+                        loggerBox.info("Message received from kafka >> " + record.value() + "\n");
                     }
                 }
                 try { Thread.sleep(100); } catch (Exception ignored) { }
             }
         } catch (Exception e){
-            logTextArea.appendText(e.getMessage());
+            loggerBox.error("KafkaClient error consuming message >> ", e);
         }finally {
             consumer.close();
         }
