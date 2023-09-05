@@ -1,7 +1,5 @@
 package org.koffa.javafxgui.recipegui;
 
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
