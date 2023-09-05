@@ -32,7 +32,6 @@ public static void main(String[] args) {
 
     @Override
     public void start(Stage stage) {
-    // TODO implement slf4j logging to LoggerBox
         // Set up stage
         ScrollPane scrollPane = new ScrollPane();
         VBox vBox = new VBox();
