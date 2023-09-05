@@ -18,9 +18,7 @@ public class RecipeStepsBox extends VBox {
         steps.getItems().addAll(new TextField("Skriv steg här"));
         this.getChildren().addAll(stepButtons, steps);
 
-        addStepButton.setOnAction(event -> {
-            steps.getItems().add(new TextField("Skriv steg här"));
-        });
+        addStepButton.setOnAction(event -> steps.getItems().add(new TextField("Skriv steg här")));
         removeStep.setOnAction(event -> {
             if (steps.getItems().size() > 1) {
                 steps.getItems().remove(steps.getItems().size() - 1);

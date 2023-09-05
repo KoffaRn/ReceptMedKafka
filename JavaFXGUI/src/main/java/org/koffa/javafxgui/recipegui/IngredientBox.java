@@ -15,9 +15,7 @@ public class IngredientBox extends VBox {
         Button addIngredientButton = new Button("Lägg till ingrediens");
         Button removeIngredient = new Button("Ta bort ingrediens");
         ingredientButtons.getItems().addAll(addIngredientButton, removeIngredient);
-        addIngredientButton.setOnAction(event -> {
-            addIngredientPane(ingredients);
-        });
+        addIngredientButton.setOnAction(event -> addIngredientPane(ingredients));
         removeIngredient.setOnAction(event -> {
             if (ingredients.getItems().size() > 1) {
                 ingredients.getItems().remove(ingredients.getItems().size() - 1);

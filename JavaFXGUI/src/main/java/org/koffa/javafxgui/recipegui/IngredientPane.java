@@ -1,12 +1,10 @@
 package org.koffa.javafxgui.recipegui;
 
 import javafx.collections.ObservableList;
-import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
-import javafx.scene.layout.VBox;
 import org.koffa.javafxgui.dto.Ingredient;
 import org.koffa.javafxgui.dto.RecipeIngredient;
 import org.koffa.javafxgui.textformatter.PositiveIntegerFilter;
@@ -19,9 +17,6 @@ public class IngredientPane extends SplitPane {
         TextField amount = new TextField("123");
         amount.setTextFormatter(textFormatter);
         this.getItems().addAll(amount, new TextField("Enhet"), new TextField("Namn på ingrediens"));
-    }
-    public ObservableList<Node> getIngredients() {
-        return this.getItems();
     }
 
     public RecipeIngredient getIngredient() {

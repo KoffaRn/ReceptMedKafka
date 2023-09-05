@@ -34,7 +34,7 @@ public class KafkaClient implements Runnable {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         this.topics = new ArrayList<>();
         this.consumer = new KafkaConsumer<>(props);
-        this.loggerBox = new LoggerBox();
+        this.loggerBox = loggerBox;
     }
 
     /**
