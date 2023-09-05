@@ -8,12 +8,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 public class RecipeStepsBox extends VBox {
-    SplitPane steps = new SplitPane();
-    SplitPane stepButtons = new SplitPane();
+    private final SplitPane steps = new SplitPane();
+
     public RecipeStepsBox() {
         steps.setOrientation(javafx.geometry.Orientation.VERTICAL);
         Button addStepButton = new Button("Lägg till steg");
         Button removeStep = new Button("Ta bort steg");
+        SplitPane stepButtons = new SplitPane();
         stepButtons.getItems().addAll(addStepButton, removeStep);
         steps.getItems().addAll(new TextField("Skriv steg här"));
         this.getChildren().addAll(stepButtons, steps);

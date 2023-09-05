@@ -1,13 +1,9 @@
 module org.koffa.javafxgui {
     requires javafx.controls;
-    requires javafx.fxml;
     requires com.google.gson;
-    requires org.controlsfx.controls;
-    requires org.kordamp.bootstrapfx.core;
     requires lombok;
-    requires com.dlsc.formsfx;
     requires kafka.clients;
-    requires org.slf4j;
+    requires org.slf4j.simple;
 
     opens org.koffa.javafxgui to javafx.fxml;
     opens org.koffa.javafxgui.dto to lombok, com.google.gson;

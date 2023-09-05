@@ -8,25 +8,27 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 
-public class LoggerBox extends VBox{
-    TextFlow logger = new TextFlow();
-    public LoggerBox() {
+public class LoggerBox extends VBox {
+    private final TextFlow logger = new TextFlow();
+    public LoggerBox(int width) {
         Label loggerLabel = new Label("Logger");
+        logger.setMaxWidth(width - 3);
+        logger.setMinWidth(width - 3);
         this.getChildren().addAll(loggerLabel, logger);
     }
     private void log(Text text) {
+        Text txtLine = new Text("--------------------\n");
         // Make sure the log is updated on the JavaFX thread
-        Platform.runLater(() -> logger.getChildren().add(text));
+        Platform.runLater(() -> logger.getChildren().addAll(text,txtLine));
     }
 
     public void info(String s) {
         Text text = new Text(s + "\n");
-        text.setFill(Color.BLACK);
+        text.setFill(Color.GREEN);
         log(text);
     }
-
-    public void error(String s, Exception e) {
-        Text text = new Text(s + " >> " + e.getMessage() + "\n");
+    public void error(String s, Throwable throwable) {
+        Text text = new Text(s + " >> " + throwable.getMessage() + "\n");
         text.setFill(Color.RED);
         log(text);
     }

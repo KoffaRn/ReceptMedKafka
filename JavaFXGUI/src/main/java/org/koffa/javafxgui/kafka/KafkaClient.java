@@ -20,8 +20,7 @@ public class KafkaClient implements Runnable {
     private final KafkaConsumer<String, String> consumer;
     private static final String BOOTSTRAP_SERVERS = getProperty("server", "localhost:9092");
     private static final String GROUP_ID = getProperty("user", "guiGroup");
-    LoggerBox loggerBox;
-
+    private final LoggerBox loggerBox;
     /***
      * Creates a new KafkaClient
      * @param loggerBox the loggerBox to log messages to
@@ -52,13 +51,13 @@ public class KafkaClient implements Runnable {
                 synchronized(this) {
                     ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
                     for (ConsumerRecord<String, String> record : records){
-                        loggerBox.info("Message received from kafka >> " + record.value() + "\n");
+                        loggerBox.info("KafkaClient: Meddelande mottaget från kafka >> " + record.value() + "\n");
                     }
                 }
                 try { Thread.sleep(100); } catch (Exception ignored) { }
             }
         } catch (Exception e){
-            loggerBox.error("KafkaClient error consuming message >> ", e);
+            loggerBox.error("KafkaClient: fel i konsumering av meddelande >> ", e);
         }finally {
             consumer.close();
         }

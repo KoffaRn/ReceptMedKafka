@@ -21,12 +21,13 @@ import java.util.ArrayList;
 import static java.lang.System.getProperty;
 
 public class MainGUI extends Application {
-    LoggerBox loggerBox = new LoggerBox();
-    RecipeBox recipeBox = new RecipeBox();
-    IngredientBox ingredientBox = new IngredientBox();
-    KafkaClient kafkaClient;
+    private final int WIDTH = 1024;
+    private final LoggerBox loggerBox = new LoggerBox(WIDTH);
+    private final RecipeBox recipeBox = new RecipeBox(WIDTH);
+    private final IngredientBox ingredientBox = new IngredientBox(WIDTH);
+    private final KafkaClient kafkaClient = new KafkaClient(loggerBox);
     private static final String TOPIC = getProperty("topic", "recipeTopic");
-public static void main(String[] args) {
+    public static void main(String[] args) {
         launch(args);
     }
 
@@ -37,8 +38,6 @@ public static void main(String[] args) {
         VBox vBox = new VBox();
         stage.setTitle("ReceptGUI");
         Button sendButton = new Button("Skicka recept");
-        loggerBox = new LoggerBox();
-        kafkaClient = new KafkaClient(loggerBox);
         kafkaClient.addTopic(TOPIC);
         // Start the kafka client in a new thread
         Thread kafkaThread = new Thread(kafkaClient);
@@ -51,7 +50,7 @@ public static void main(String[] args) {
                 loggerBox
         );
         scrollPane.setContent(vBox);
-        Scene scene = new Scene(scrollPane, 550, 800);
+        Scene scene = new Scene(scrollPane, WIDTH, 768);
         stage.setScene(scene);
         stage.show();
 

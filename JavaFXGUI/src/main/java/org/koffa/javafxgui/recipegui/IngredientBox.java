@@ -7,9 +7,11 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.VBox;
 
 public class IngredientBox extends VBox {
-    SplitPane ingredients = new SplitPane();
-    SplitPane ingredientButtons = new SplitPane();
-    public IngredientBox() {
+    final SplitPane ingredients = new SplitPane();
+    final SplitPane ingredientButtons = new SplitPane();
+    public IngredientBox(int width) {
+        this.setMinWidth(width - 3);
+        this.setMaxWidth(width - 3);
         ingredients.setOrientation(javafx.geometry.Orientation.VERTICAL);
         addIngredientPane(ingredients);
         Button addIngredientButton = new Button("Lägg till ingrediens");
