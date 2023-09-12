@@ -41,16 +41,18 @@ public class ConfigManager {
     private void generateConfig() {
         try(OutputStream output = new FileOutputStream(FILE_PATH)) {
             File file = new File(FILE_PATH);
-            file.createNewFile();
-            Properties prop = new Properties();
-            prop.setProperty("kafka.bootstrap.servers", "localhost:9092");
-            prop.setProperty("kafka.topic", "recipeTopic");
-            prop.setProperty("kafka.group-id", "guiRecipe");
-            prop.setProperty("api.url", "http://localhost:8080/api/v1/recipe");
-            // save properties to project root folder, config.properties
-            // props.store(output, null) will escape : and = characters, so use this instead
-            for(String key : prop.stringPropertyNames()) {
-                output.write((key + "=" + prop.getProperty(key) + "\n").getBytes());
+            if(file.createNewFile()) {
+                System.out.println(FILE_PATH + " skapad");
+                Properties prop = new Properties();
+                prop.setProperty("kafka.bootstrap.servers", "localhost:9092");
+                prop.setProperty("kafka.topic", "recipeTopic");
+                prop.setProperty("kafka.group-id", "guiRecipe");
+                prop.setProperty("api.url", "http://localhost:8080/api/v1/recipe");
+                // save properties to project root folder, config.properties
+                // props.store(output, null) will escape : and = characters, so use this instead
+                for (String key : prop.stringPropertyNames()) {
+                    output.write((key + "=" + prop.getProperty(key) + "\n").getBytes());
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException("Kunde inte skapa config.properties", e);

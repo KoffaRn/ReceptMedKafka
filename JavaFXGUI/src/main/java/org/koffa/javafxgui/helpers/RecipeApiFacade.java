@@ -5,7 +5,6 @@ import org.koffa.javafxgui.dto.Recipe;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -18,7 +17,7 @@ public class RecipeApiFacade implements RecipeSender {
      * Creates a new RecipeSender
      * @throws IOException if the connection fails
      */
-    public RecipeApiFacade(String url) throws IOException {
+    public RecipeApiFacade(String url) {
         // Open the connection
         this.url = url;
     }

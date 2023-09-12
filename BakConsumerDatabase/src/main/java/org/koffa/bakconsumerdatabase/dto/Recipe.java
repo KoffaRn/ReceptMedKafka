@@ -21,5 +21,4 @@ public class Recipe {
     public List<RecipeIngredient> recipeIngredients;
     @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
     private List<String> steps;
-
 }

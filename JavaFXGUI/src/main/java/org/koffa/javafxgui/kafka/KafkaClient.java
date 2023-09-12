@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static java.lang.System.getProperty;
-
 public class KafkaClient implements Runnable {
     private final AtomicBoolean running = new AtomicBoolean(true);
     private final List<String> topics;
