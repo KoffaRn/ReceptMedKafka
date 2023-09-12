@@ -1,8 +1,0 @@
-org/koffa/javafxgui/textformatter/PositiveIntegerFilter.class
-org/koffa/javafxgui/dto/Ingredient.class
-module-info.class
-org/koffa/javafxgui/RecipeSender.class
-org/koffa/javafxgui/dto/RecipeIngredient.class
-org/koffa/javafxgui/textformatter/PositiveIntegerStringConverter.class
-org/koffa/javafxgui/dto/Recipe.class
-org/koffa/javafxgui/kafka/KafkaClient.class

@@ -10,6 +10,8 @@ public class KafkaTopicConfig {
     @Bean
     public NewTopic recipeTopic() {
         return TopicBuilder.name("recipeTopic")
+                .partitions(3)
+                .replicas(3)
                 .build();
     }
 }

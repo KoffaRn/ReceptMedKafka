@@ -46,11 +46,16 @@ public class RecipeKafkaDatabaseConsumer {
     }
 
     private void consumeRecipe(String message) {
-        Gson gson = new Gson();
-        Recipe recipe = gson.fromJson(message, Recipe.class);
-        if(recipe.getRecipeIngredients() != null)
-            persistRecipeIngredients(recipe);
-        recipeRepository.save(recipe);
+        try {
+            Gson gson = new Gson();
+            Recipe recipe = gson.fromJson(message, Recipe.class);
+            if (recipe.getRecipeIngredients() != null)
+                persistRecipeIngredients(recipe);
+            recipeRepository.save(recipe);
+            LOGGER.info(String.format("#### -> Recipe saved to database -> %s", recipe));
+        } catch (Exception e) {
+            LOGGER.error(String.format("#### -> Error saving recipe to database -> %s", e.getMessage()));
+        }
     }
 
     //Persists recipes ingredients to the database

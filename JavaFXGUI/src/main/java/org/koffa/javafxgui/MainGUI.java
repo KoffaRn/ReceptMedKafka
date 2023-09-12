@@ -2,97 +2,63 @@ package org.koffa.javafxgui;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
-import org.koffa.javafxgui.dto.Recipe;
-import org.koffa.javafxgui.dto.RecipeIngredient;
-import org.koffa.javafxgui.helpers.RecipeSender;
-import org.koffa.javafxgui.kafka.KafkaClient;
-import org.koffa.javafxgui.recipegui.*;
+import org.koffa.javafxgui.helpers.ConfigManager;
+import org.koffa.javafxgui.helpers.RecipeApiFacade;
+import org.koffa.javafxgui.recipegui.sendgui.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
 
-import static java.lang.System.getProperty;
 
 public class MainGUI extends Application {
-    private final int WIDTH = 1024;
-    private final LoggerBox loggerBox = new LoggerBox(WIDTH);
-    private final RecipeBox recipeBox = new RecipeBox(WIDTH);
-    private final IngredientBox ingredientBox = new IngredientBox(WIDTH);
-    private final KafkaClient kafkaClient = new KafkaClient(loggerBox);
-    private static final String TOPIC = getProperty("topic", "recipeTopic");
+    private SendBox sendBox;
+    private String API_URL;
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
     public void start(Stage stage) {
-        // Set up stage
-        ScrollPane scrollPane = new ScrollPane();
-        VBox vBox = new VBox();
-        stage.setTitle("ReceptGUI");
-        Button sendButton = new Button("Skicka recept");
-        kafkaClient.addTopic(TOPIC);
-        // Start the kafka client in a new thread
-        Thread kafkaThread = new Thread(kafkaClient);
-        kafkaThread.start();
-        // Add the components to the stage and show it
-        vBox.getChildren().addAll(
-                recipeBox,
-                ingredientBox,
-                sendButton,
-                loggerBox
-        );
-        scrollPane.setContent(vBox);
-        Scene scene = new Scene(scrollPane, WIDTH, 768);
+        ConfigManager configManager = ConfigManager.getInstance();
+        int WIDTH = configManager.getAPP_WIDTH();
+        API_URL = configManager.getAPI_URL();
+        RecipeApiFacade recipeApiFacade = getRecipeApiFacade();
+        // Set up tabs
+        ScrollPane sendscrollPane = new ScrollPane();
+        TabPane tabPane = new TabPane();
+        Tab sendTab = new Tab("Skicka recept");
+        sendTab.setClosable(false);
+        Tab getTab = new Tab("Hämta recept");
+        getTab.setClosable(false);
+        // Set up send tab
+        sendBox = new SendBox(recipeApiFacade, configManager);
+        sendscrollPane.setContent(sendBox);
+        sendTab.setContent(sendscrollPane);
+        // Set up get tab
+
+        tabPane.getTabs().addAll(sendTab, getTab);
+        Scene scene = new Scene(tabPane, WIDTH, 768);
         stage.setScene(scene);
         stage.show();
-
-        // Add functionality to the send button
-        sendButton.setOnAction(this::handle);
     }
 
-    // Send the recipe to the API
-    private String sendRecipe(Recipe recipe) throws IOException {
-        RecipeSender recipeSender = new RecipeSender();
-        return recipeSender.sendRecipe(recipe);
-
-    }
-
-    // Get the recipe from the GUI
-    private Recipe getRecipe() {
-        Recipe recipe = new Recipe();
-        recipe.setName(recipeBox.getRecipeName());
-        recipe.setDescription(recipeBox.getRecipeDescription());
-        recipe.setSteps(recipeBox.getSteps());
-        ArrayList<RecipeIngredient> recipeIngredients = new ArrayList<>();
-        for (Node node : ingredientBox.getIngredients()) {
-            recipeIngredients.add(((IngredientPane) node).getIngredient());
+    private RecipeApiFacade getRecipeApiFacade() {
+        try {
+            RecipeApiFacade recipeApiFacade = new RecipeApiFacade(API_URL);
+            recipeApiFacade.test();
+            return recipeApiFacade;
+        } catch (Exception e) {
+            System.err.println("Kunde inte ansluta till API >> " + e.getMessage());
+            return null;
         }
-        recipe.setRecipeIngredients(recipeIngredients);
-        return recipe;
     }
-
     //close the kafka client
     @Override
     public void stop() {
-        kafkaClient.interrupt();
+        sendBox.exit();
         Platform.exit();
-    }
-
-    private void handle(ActionEvent event) {
-        try {
-            String response = sendRecipe(getRecipe());
-            loggerBox.info("Send recipe to api >> " + response);
-        } catch (Exception e) {
-            loggerBox.error("Kunde inte skicka receptet till API >> ", e);
-        }
-
     }
 }

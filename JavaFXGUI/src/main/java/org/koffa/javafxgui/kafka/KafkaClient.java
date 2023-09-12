@@ -5,7 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.koffa.javafxgui.recipegui.LoggerBox;
+import org.koffa.javafxgui.recipegui.sendgui.LoggerBox;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -19,22 +19,22 @@ public class KafkaClient implements Runnable {
     private final AtomicBoolean running = new AtomicBoolean(true);
     private final List<String> topics;
     private final KafkaConsumer<String, String> consumer;
-    private static final String BOOTSTRAP_SERVERS = getProperty("server", "localhost:9092");
-    private static final String GROUP_ID = getProperty("user", "guiGroup");
     private final LoggerBox loggerBox;
     /***
      * Creates a new KafkaClient
      * @param loggerBox the loggerBox to log messages to
      */
-    public KafkaClient(LoggerBox loggerBox) {
+
+    public KafkaClient(String kafkaServer, String kafkaTopic, String kafkaGroupId, LoggerBox loggerBox) {
         Properties props = new Properties();
-        props.put("bootstrap.servers", BOOTSTRAP_SERVERS);
-        props.put("group.id", GROUP_ID);
+        props.put("bootstrap.servers", kafkaServer);
+        props.put("group.id", kafkaGroupId);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         this.topics = new ArrayList<>();
         this.consumer = new KafkaConsumer<>(props);
         this.loggerBox = loggerBox;
+        addTopic(kafkaTopic);
     }
 
     /**
@@ -60,6 +60,19 @@ public class KafkaClient implements Runnable {
             loggerBox.error("KafkaClient: fel i konsumering av meddelande >> ", e);
         }finally {
             consumer.close();
+        }
+    }
+    public void printAllMessages() {
+        synchronized (this) {
+            consumer.seekToBeginning(consumer.assignment());
+            consumer.seekToEnd(consumer.assignment());
+            ConsumerRecords<String, String> records;
+            do {
+                records = consumer.poll(Duration.ofMillis(10));
+                for (ConsumerRecord<String, String> record : records) {
+                    loggerBox.info("KafkaClient: Meddelande mottaget från kafka >> " + record.value());
+                }
+            } while (!records.isEmpty());
         }
     }
 

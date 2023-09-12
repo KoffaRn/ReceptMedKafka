@@ -1,4 +1,4 @@
-package org.koffa.javafxgui.recipegui;
+package org.koffa.javafxgui.recipegui.sendgui;
 
 import javafx.application.Platform;
 import javafx.scene.control.Label;

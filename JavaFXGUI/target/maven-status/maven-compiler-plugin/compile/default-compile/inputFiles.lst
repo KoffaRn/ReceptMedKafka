@@ -1,9 +1,0 @@
-/home/koffa/IdeaProjects/ReceptMedKafka/JavaFXGUI/src/main/java/org/koffa/javafxgui/textformatter/PositiveIntegerStringConverter.java
-/home/koffa/IdeaProjects/ReceptMedKafka/JavaFXGUI/src/main/java/org/koffa/javafxgui/dto/Recipe.java
-/home/koffa/IdeaProjects/ReceptMedKafka/JavaFXGUI/src/main/java/org/koffa/javafxgui/kafka/KafkaClient.java
-/home/koffa/IdeaProjects/ReceptMedKafka/JavaFXGUI/src/main/java/org/koffa/javafxgui/GraphicalUI.java
-/home/koffa/IdeaProjects/ReceptMedKafka/JavaFXGUI/src/main/java/org/koffa/javafxgui/textformatter/PositiveIntegerFilter.java
-/home/koffa/IdeaProjects/ReceptMedKafka/JavaFXGUI/src/main/java/org/koffa/javafxgui/RecipeSender.java
-/home/koffa/IdeaProjects/ReceptMedKafka/JavaFXGUI/src/main/java/org/koffa/javafxgui/dto/Ingredient.java
-/home/koffa/IdeaProjects/ReceptMedKafka/JavaFXGUI/src/main/java/module-info.java
-/home/koffa/IdeaProjects/ReceptMedKafka/JavaFXGUI/src/main/java/org/koffa/javafxgui/dto/RecipeIngredient.java
